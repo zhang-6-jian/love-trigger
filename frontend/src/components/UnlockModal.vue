@@ -7,13 +7,18 @@ import Icon from './Icon.vue'
 
 const base = import.meta.env.BASE_URL
 const PAY_QR = {
-  wechat: { label: '微信支付', src: `${base}pay-wechat.jpg` },
-  alipay: { label: '支付宝', src: `${base}pay-alipay.jpg` }
+  wechat: { label: '微信支付', src: `${base}pay-wechat.jpg`, fixed: true },
+  alipay: { label: '支付宝', src: `${base}pay-alipay.jpg`, fixed: false }
 }
 
 const payChannel = ref('wechat')
 const qrFailed = ref(false)
 const currentQr = computed(() => PAY_QR[payChannel.value])
+const payHint = computed(() =>
+  currentQr.value.fixed
+    ? `长按二维码识别 · 直接付款 ¥${PASS_PLAN.price}`
+    : `长按二维码识别 · 请手动输入 ¥${PASS_PLAN.price}`
+)
 
 function switchChannel(channel) {
   payChannel.value = channel
@@ -67,7 +72,7 @@ async function copyWechat() {
           </button>
         </div>
         <img :src="currentQr.src" :alt="`${currentQr.label}收款码`" @error="qrFailed = true" />
-        <p class="pay-qr__hint">长按二维码识别 · 付款金额 ¥{{ PASS_PLAN.price }}</p>
+        <p class="pay-qr__hint">{{ payHint }}</p>
       </div>
 
       <div v-else class="unlock-wechat">
