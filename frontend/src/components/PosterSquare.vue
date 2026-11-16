@@ -52,7 +52,7 @@ const scenes = (props.result.scenes || []).slice(0, 2)
       <div class="card__cta">
         <strong>你是被哪个瞬间拿捏的？</strong>
         <p>19 道情境题 · 按性别+年龄段出题</p>
-        <p>{{ showQr ? '扫码测你的上头触发器' : '搜索「恋爱上头触发器」测同款' }}</p>
+        <p>{{ showQr ? '扫码测你的上头触发器' : '你是哪一种？评论区告诉我' }}</p>
       </div>
     </footer>
 
