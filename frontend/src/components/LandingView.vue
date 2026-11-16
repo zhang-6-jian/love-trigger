@@ -217,7 +217,7 @@ function scrollTo(selector) {
 
     <footer class="site-footer">
       <div class="site-footer__brand">恋爱上头触发器 <span>·</span> 上头研究所</div>
-      <p>本测试仅供娱乐与自我观察，不构成心理诊断或恋爱建议。</p>
+      <p>本测试为趣味心理测评，结果仅供娱乐与自我了解参考，不构成心理诊断、医疗建议或心理治疗。如有持续困扰，请寻求专业心理帮助。</p>
       <p class="site-footer__meta">© 2026 LOVE TRIGGER LAB · 内测版</p>
     </footer>
   </div>

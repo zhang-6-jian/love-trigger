@@ -76,7 +76,7 @@ onBeforeUnmount(() => window.removeEventListener('scroll', onScroll))
     <section class="result-actions" aria-label="结果操作">
       <button class="action-btn action-btn--primary" @click="openPoster">
         <Icon name="image" />
-        <span><b>保存长图</b><small>存进手机相册</small></span>
+        <span><b>保存图片</b><small>存进手机相册</small></span>
       </button>
       <button class="action-btn" @click="copyResult">
         <Icon name="copy" />
@@ -186,7 +186,7 @@ onBeforeUnmount(() => window.removeEventListener('scroll', onScroll))
       <h2>把这个测试，发给那个总让你上头的人。</h2>
       <div>
         <button class="btn btn--primary" @click="shareResult">分享给对方</button>
-        <button class="btn btn--ghost" @click="openPoster">保存长图</button>
+        <button class="btn btn--ghost" @click="openPoster">保存图片</button>
       </div>
     </section>
 
@@ -197,13 +197,26 @@ onBeforeUnmount(() => window.removeEventListener('scroll', onScroll))
     </footer>
 
     <div class="sticky-actions" :class="{ 'is-visible': stickyVisible }" aria-label="快捷操作">
-      <button @click="openPoster"><Icon name="image" />保存长图</button>
+      <button @click="openPoster"><Icon name="image" />保存图片</button>
       <button @click="shareResult"><Icon name="share" />分享</button>
     </div>
+    <p class="result-disclaimer">
+      本测试为趣味心理测评，结果仅供娱乐与自我了解参考，不构成心理诊断、医疗建议或心理治疗。如有持续困扰，请寻求专业心理帮助。
+    </p>
   </main>
 </template>
 
 <style scoped>
+.result-disclaimer {
+  margin: 40px auto 0;
+  max-width: 620px;
+  padding: 0 20px;
+  color: var(--muted);
+  font-size: 11.5px;
+  line-height: 1.8;
+  text-align: center;
+}
+
 .upsell-lead {
   margin: -6px 0 18px;
   color: var(--muted);

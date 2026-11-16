@@ -90,6 +90,6 @@ const date = computed(() =>
         <p>19 道情境题 · 按性别+年龄段出题<br />扫码或搜索「恋爱上头触发器」</p>
       </div>
     </footer>
-    <p class="poster__disclaimer">本测试仅供娱乐与自我观察，不构成心理诊断或恋爱建议。</p>
+    <p class="poster__disclaimer">本测试为趣味心理测评，仅供娱乐与自我了解参考，不构成心理诊断、医疗建议或心理治疗。</p>
   </div>
 </template>

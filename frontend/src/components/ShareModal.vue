@@ -32,8 +32,8 @@ function savePoster() {
     </div>
     <div class="modal-actions modal-actions--stack">
       <button class="btn btn--primary" @click="copyLink">复制链接</button>
-      <button class="btn btn--ghost" @click="savePoster">保存长图再分享</button>
+      <button class="btn btn--ghost" @click="savePoster">保存图片再分享</button>
     </div>
-    <p class="modal-hint">微信 / 朋友圈：复制链接后粘贴；或保存长图直接发图片。</p>
+    <p class="modal-hint">微信 / 朋友圈：复制链接后粘贴；或保存图片直接发。</p>
   </ModalShell>
 </template>
