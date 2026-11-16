@@ -3,8 +3,10 @@ import { computed } from 'vue'
 import { RESULTS, TYPE_ORDER } from '../data'
 import {
   TOTAL,
+  ageGroupLabel,
   answeredCount,
   goHome,
+  openAgeModal,
   openModal,
   startQuiz,
   state,
@@ -28,7 +30,7 @@ const primaryLabel = computed(() => {
 })
 const totalText = computed(() => {
   const total = state.stats.totalAssessments
-  return total > 0 ? total.toLocaleString('zh-CN') : '3,260'
+  return total > 0 ? total.toLocaleString('zh-CN') : '0'
 })
 
 function runPrimary() {
@@ -67,10 +69,10 @@ function scrollTo(selector) {
     <main>
       <section class="hero">
         <div class="hero__copy">
-          <p class="eyebrow"><span class="eyebrow__dot"></span>恋爱人格 · 24 题 · 5 分钟</p>
+          <p class="eyebrow"><span class="eyebrow__dot"></span>恋爱人格 · 按年龄段出题 · 约 4 分钟</p>
           <h1>你不是恋爱脑，<br /><em>你只是被某个瞬间</em><br />拿捏了。</h1>
           <p class="hero__lead">
-            24 道真实情境题，拆出你在恋爱里最容易上头的那个瞬间。不是给你贴标签，是让你看清自己的“心动开关”。
+            18 道贴近你所在年龄段的情境题，拆出你在恋爱里最容易上头的那个瞬间。不是给你贴标签，是让你看清自己的“心动开关”。
           </p>
           <div class="hero__actions">
             <button class="btn btn--primary btn--large" @click="runPrimary">
@@ -84,8 +86,15 @@ function scrollTo(selector) {
               重新开始
             </button>
           </div>
+          <div class="hero__age">
+            <template v-if="state.ageGroup">
+              当前年龄段：<b>{{ ageGroupLabel() }}</b>
+              <button type="button" @click="openAgeModal">更换</button>
+            </template>
+            <template v-else>开始前先选年龄段，题目会按阶段变化。</template>
+          </div>
           <div class="hero__meta">
-            <span>6 种触发器</span><i></i><span>24 个真实瞬间</span><i></i><span>结果可存长图</span>
+            <span>6 种触发器</span><i></i><span>18 个真实瞬间</span><i></i><span>结果可存长图</span>
           </div>
         </div>
 
@@ -102,7 +111,7 @@ function scrollTo(selector) {
                 <span :style="{ '--dot': RESULTS[type].color }"></span>{{ RESULTS[type].short }}<b>0{{ index + 1 }}</b>
               </div>
             </div>
-            <div class="hero-card__foot">24 QUESTIONS · 5 MIN</div>
+            <div class="hero-card__foot">18 QUESTIONS · 4 MIN</div>
           </article>
           <div class="float-chip float-chip--a">心动不是玄学<br /><b>是有开关的</b></div>
           <div class="float-chip float-chip--b">已生成 {{ totalText }} 份<br /><b>心动诊断书</b></div>
@@ -143,7 +152,7 @@ function scrollTo(selector) {
           <article class="step-card">
             <span class="step-card__no">01</span>
             <h3>凭第一反应选</h3>
-            <p>24 道真实情境题，没有标准答案，也别想太久。</p>
+            <p>18 道贴近你年龄段的情境题，没有标准答案，也别想太久。</p>
           </article>
           <article class="step-card">
             <span class="step-card__no">02</span>
@@ -179,7 +188,7 @@ function scrollTo(selector) {
           </details>
           <details>
             <summary>要答多久？</summary>
-            <p>24 题，大约 5 分钟。选择后自动进入下一题，也可以随时返回上一题修改。</p>
+            <p>18 题，大约 4 分钟。开始前先选年龄段，题目会对应你的阶段；选择后自动进入下一题，也可以随时返回修改。</p>
           </details>
           <details>
             <summary>结果能保存吗？</summary>

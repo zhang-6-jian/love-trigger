@@ -12,7 +12,7 @@ import Icon from './Icon.vue'
       <div class="analyze-orb__core"><Icon name="heart" /></div>
     </div>
     <p class="eyebrow">ANALYSING YOUR TRIGGER</p>
-    <h2>24 个瞬间，<br />正在拼成你的答案。</h2>
+    <h2>18 个瞬间，<br />正在拼成你的答案。</h2>
     <div class="analyze-steps">
       <span>拆解情境</span><i></i><span>匹配触发器</span><i></i><span>生成诊断书</span>
     </div>

@@ -2,6 +2,7 @@
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { RESULTS } from '../data'
 import {
+  ageGroupLabel,
   copyResult,
   goHome,
   openModal,
@@ -32,7 +33,7 @@ onBeforeUnmount(() => window.removeEventListener('scroll', onScroll))
   <main class="result-shell">
     <header class="result-nav">
       <button class="brand-mini" @click="goHome">← 首页</button>
-      <span class="result-nav__tag">内测版 · 结果报告</span>
+      <span class="result-nav__tag">{{ ageGroupLabel() }} · 结果报告</span>
       <button class="icon-btn" aria-label="重新测试" @click="openModal('restart')"><Icon name="refresh" /></button>
     </header>
 
@@ -47,7 +48,7 @@ onBeforeUnmount(() => window.removeEventListener('scroll', onScroll))
           <small>{{ result.english }}</small>
         </div>
         <div class="result-title-wrap">
-          <p class="result-ratio">内测样本占比 {{ result.ratio }}%</p>
+          <p class="result-ratio">{{ ageGroupLabel() }} · 18 题结果</p>
           <h1>{{ result.name }}</h1>
           <p class="result-tagline">{{ result.tagline }}</p>
           <div class="keyword-row">

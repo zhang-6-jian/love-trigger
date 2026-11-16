@@ -1,8 +1,10 @@
 import { reactive } from 'vue'
-import { QUESTIONS, RESULTS, TYPE_ORDER, SEED_REVIEWS } from '../data'
-import { api } from './api'
+import { RESULTS, TYPE_ORDER, SEED_REVIEWS } from '../data'
+import { AGE_GROUPS, QUESTION_SETS } from '../questions'
+import { cloud, cloudEnabled } from './cloud'
 
-export const TOTAL = QUESTIONS.length
+export const TOTAL = 18
+export const AGE_OPTIONS = AGE_GROUPS
 
 const PROGRESS_KEY = 'love-trigger-progress-v2'
 const LIKES_KEY = 'love-trigger-likes-v2'
@@ -10,14 +12,15 @@ const VISITOR_KEY = 'love-trigger-visitor-id'
 const SERIAL_KEY = 'love-trigger-serial-v1'
 const REVIEWS_KEY = 'love-trigger-reviews-v2'
 
-// GitHub Pages 等纯静态环境没有后端，好评/点赞落本地；本地开发仍走后端接口
-const STATIC_MODE =
-  import.meta.env.VITE_STATIC === '1' || location.hostname.endsWith('github.io')
+// 配置了 Supabase 就走云端；否则降级为浏览器本地存储
+const CLOUD_MODE = cloudEnabled
 
 export const state = reactive({
   screen: 'landing',
   index: 0,
   answers: Array(TOTAL).fill(null),
+  ageGroup: '',
+  questions: [],
   result: null,
   animating: false,
   reviews: [...SEED_REVIEWS],
@@ -27,7 +30,7 @@ export const state = reactive({
   modal: '',
   toast: '',
   toastVisible: false,
-  stats: { totalAssessments: 0, typeCounts: {}, totalReviews: 0 },
+  stats: { totalAssessments: 0, typeCounts: {}, totalReviews: 0, recent: [] },
   serial: '',
   savedResultId: null
 })
@@ -82,6 +85,10 @@ export function shareUrl() {
   return location.origin + location.pathname
 }
 
+export function ageGroupLabel(id = state.ageGroup) {
+  return AGE_GROUPS.find((group) => group.id === id)?.label || ''
+}
+
 /* ------------------------------------------------------------------ */
 /*  答题进度                                                            */
 /* ------------------------------------------------------------------ */
@@ -99,7 +106,12 @@ function saveProgress() {
   try {
     localStorage.setItem(
       PROGRESS_KEY,
-      JSON.stringify({ answers: state.answers, index: state.index, updatedAt: Date.now() })
+      JSON.stringify({
+        ageGroup: state.ageGroup,
+        answers: state.answers,
+        index: state.index,
+        updatedAt: Date.now()
+      })
     )
   } catch {
     /* 隐私模式下忽略 */
@@ -111,6 +123,9 @@ function loadProgress() {
     const raw = localStorage.getItem(PROGRESS_KEY)
     if (!raw) return
     const saved = JSON.parse(raw)
+    if (!QUESTION_SETS[saved.ageGroup]) return
+    state.ageGroup = saved.ageGroup
+    state.questions = QUESTION_SETS[saved.ageGroup]
     if (Array.isArray(saved.answers) && saved.answers.length === TOTAL) {
       state.answers = saved.answers.map((answer) => (TYPE_ORDER.includes(answer) ? answer : null))
       state.index = Math.min(Math.max(Number(saved.index) || 0, 0), TOTAL - 1)
@@ -165,11 +180,32 @@ export function serialNo() {
 /* ------------------------------------------------------------------ */
 
 export function startQuiz(fresh = false) {
+  if (!state.ageGroup || !state.questions.length) {
+    state.modal = 'age'
+    return
+  }
   if (fresh) resetProgress()
   state.screen = 'quiz'
   state.index = firstUnanswered()
   setHash('#quiz')
   scrollToTop()
+}
+
+export function startWithAge(ageId) {
+  if (!QUESTION_SETS[ageId]) return
+  state.ageGroup = ageId
+  state.questions = QUESTION_SETS[ageId]
+  resetProgress()
+  state.modal = ''
+  state.screen = 'quiz'
+  state.index = 0
+  setHash('#quiz')
+  scrollToTop()
+  saveProgress()
+}
+
+export function openAgeModal() {
+  state.modal = 'age'
 }
 
 export function goBack() {
@@ -180,8 +216,8 @@ export function goBack() {
 
 export function chooseAnswer(type) {
   if (state.animating || state.screen !== 'quiz') return
-  const question = QUESTIONS[state.index]
-  if (!question.options.some((option) => option.type === type)) return
+  const question = state.questions[state.index]
+  if (!question || !question.options.some((option) => option.type === type)) return
 
   state.answers[state.index] = type
   saveProgress()
@@ -227,24 +263,15 @@ export function goHome() {
 }
 
 async function persistResult() {
-  if (!state.result || STATIC_MODE) return
+  if (!state.result || !CLOUD_MODE) return
   try {
-    const response = await api.saveResult({
-      answers: state.answers,
+    await cloud.saveResult({
       primary: state.result.primary,
       secondary: state.result.secondary,
       dual: state.result.dual,
-      scores: state.result.scores,
+      ageGroup: state.ageGroup,
       visitorId: getVisitorId()
     })
-    state.savedResultId = response.id
-    state.serial = response.serial
-    state.stats.totalAssessments = response.total
-    try {
-      localStorage.setItem(SERIAL_KEY, response.serial)
-    } catch {
-      /* noop */
-    }
   } catch (error) {
     console.warn('结果同步失败，已保留本地结果：', error.message)
   }
@@ -316,13 +343,13 @@ function localReview(payload) {
 
 export async function loadReviews() {
   loadLocalLikes()
-  if (STATIC_MODE) {
+  if (!CLOUD_MODE) {
     state.reviews = [...loadLocalReviews(), ...SEED_REVIEWS]
     state.reviewsRemote = false
     return
   }
   try {
-    const rows = await api.fetchReviews(getVisitorId())
+    const rows = await cloud.fetchReviews(getVisitorId())
     if (Array.isArray(rows)) {
       state.reviews = rows
       state.reviewsRemote = true
@@ -330,8 +357,10 @@ export async function loadReviews() {
       saveLikes()
     }
   } catch (error) {
-    console.warn('好评加载失败，使用内置数据：', error.message)
+    console.warn('云端好评加载失败，使用本地数据：', error.message)
+    state.reviews = [...loadLocalReviews(), ...SEED_REVIEWS]
     state.reviewsRemote = false
+    state.likes = loadLocalLikes()
   }
 }
 
@@ -354,7 +383,7 @@ export async function toggleLike(id) {
   const review = state.reviews.find((item) => String(item.id) === key)
   if (review) review.likes = Math.max(0, review.likes + (nextLiked ? 1 : -1))
   try {
-    const response = await api.toggleLike(id, getVisitorId(), nextLiked)
+    const response = await cloud.toggleLike(id, getVisitorId(), nextLiked)
     if (review && typeof response.likes === 'number') review.likes = response.likes
   } catch (error) {
     if (nextLiked) state.likes = state.likes.filter((item) => item !== key)
@@ -366,7 +395,7 @@ export async function toggleLike(id) {
 }
 
 export async function submitReview(payload) {
-  if (STATIC_MODE) {
+  if (!CLOUD_MODE) {
     const review = localReview(payload)
     const locals = loadLocalReviews()
     locals.unshift(review)
@@ -375,27 +404,29 @@ export async function submitReview(payload) {
     return review
   }
   try {
-    const review = await api.createReview(payload)
-    state.reviews.unshift(review)
+    await cloud.createReview(payload)
+    const rows = await cloud.fetchReviews(getVisitorId())
+    state.reviews = rows
     state.reviewsRemote = true
-    return review
+    return rows[0] || localReview(payload)
   } catch (error) {
-    if (location.protocol === 'file:') throw error
+    console.warn('好评提交失败，已暂存本地：', error.message)
     const review = localReview(payload)
     const locals = loadLocalReviews()
     locals.unshift(review)
     saveLocalReviews(locals)
     state.reviews.unshift(review)
+    state.reviewsRemote = false
     return review
   }
 }
 
 export async function loadStats() {
-  if (STATIC_MODE) return
+  if (!CLOUD_MODE) return
   try {
-    state.stats = await api.stats()
-  } catch {
-    /* 忽略统计失败 */
+    state.stats = await cloud.fetchStats()
+  } catch (error) {
+    console.warn('统计加载失败：', error.message)
   }
 }
 
@@ -463,7 +494,9 @@ export async function shareResult() {
 export function boot() {
   loadProgress()
 
-  if (location.hash === '#result' && answeredCount() === TOTAL) {
+  if (location.hash === '#stats') {
+    state.screen = 'stats'
+  } else if (location.hash === '#result' && answeredCount() === TOTAL) {
     state.result = calcResult()
     try {
       state.serial = localStorage.getItem(SERIAL_KEY) || ''

@@ -1,12 +1,11 @@
 <script setup>
 import { computed, nextTick, ref, watch } from 'vue'
-import { QUESTIONS } from '../data'
-import { TOTAL, answeredCount, chooseAnswer, goBack, openModal, state } from '../lib/store'
+import { TOTAL, ageGroupLabel, answeredCount, chooseAnswer, goBack, openModal, state } from '../lib/store'
 import Icon from './Icon.vue'
 
 const titleRef = ref(null)
 
-const question = computed(() => QUESTIONS[state.index])
+const question = computed(() => state.questions[state.index])
 const selected = computed(() => state.answers[state.index])
 const progress = computed(() => Math.max(2, Math.round((answeredCount() / TOTAL) * 100)))
 
@@ -36,7 +35,7 @@ nextTick(() => titleRef.value?.focus({ preventScroll: true }))
     </header>
 
     <section class="quiz-card" aria-live="polite">
-      <div class="quiz-card__tag">{{ question.group }}</div>
+      <div class="quiz-card__tag">{{ question.group }} · {{ ageGroupLabel() }}</div>
       <h2 ref="titleRef" class="question-title" tabindex="-1">{{ question.text }}</h2>
       <div class="options">
         <button
