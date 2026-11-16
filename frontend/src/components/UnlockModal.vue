@@ -1,7 +1,7 @@
 <script setup>
 import { computed, ref } from 'vue'
 import { PASS_PLAN } from '../lib/plans'
-import { afterUnlock, closeModal, copyText, showToast } from '../lib/store'
+import { afterUnlock, closeModal, copyText, getVisitorId, showToast } from '../lib/store'
 import { cloud, cloudEnabled } from '../lib/cloud'
 import ModalShell from './ModalShell.vue'
 import Icon from './Icon.vue'
@@ -52,7 +52,7 @@ async function redeem() {
   submitting.value = true
   errorMsg.value = ''
   try {
-    const ok = await cloud.redeemCode(value)
+    const ok = await cloud.redeemCode(value, getVisitorId())
     if (ok) {
       afterUnlock()
     } else {

@@ -109,10 +109,10 @@ export const cloud = {
     return { ok: true }
   },
 
-  async redeemCode(code) {
+  async redeemCode(code, visitorId) {
     const result = await request('rpc/redeem_code', {
       method: 'POST',
-      body: JSON.stringify({ p_code: code })
+      body: JSON.stringify({ p_code: code, p_visitor: visitorId || null })
     })
     return result === true
   },
