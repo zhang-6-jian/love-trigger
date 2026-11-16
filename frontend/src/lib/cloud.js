@@ -117,6 +117,21 @@ export const cloud = {
     return result === true
   },
 
+  async adminInventory(secret) {
+    return request('rpc/admin_inventory', {
+      method: 'POST',
+      body: JSON.stringify({ p_secret: secret })
+    })
+  },
+
+  async adminIssueCode(secret, count = 1) {
+    const rows = await request('rpc/admin_issue_code', {
+      method: 'POST',
+      body: JSON.stringify({ p_secret: secret, p_count: count })
+    })
+    return (rows || []).map((row) => row.out_code)
+  },
+
   async fetchStats() {
     const [overview, stats, recent] = await Promise.all([
       request('overview_stats?select=*'),
