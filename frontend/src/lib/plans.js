@@ -1,53 +1,23 @@
-// 付费套餐定义（展示型，人工开通）
-export const PLANS = [
-  {
-    id: 'free',
-    name: '免费体验',
-    price: '0',
-    unit: '元',
-    desc: '先看看你是哪一种上头',
-    features: [
-      '19 道情境题（按性别 + 年龄段）',
-      '8 种触发器结果 + 心理学解释',
-      '基础海报长图',
-      '云端好评墙'
-    ],
-    cta: '免费开始',
-    highlight: false
-  },
-  {
-    id: 'deep',
-    name: '深度报告',
-    price: '19.9',
-    unit: '元 / 份',
-    desc: '把「为什么」讲透',
-    features: [
-      '完整版深度报告 · 逐题得分拆解',
-      '8 维触发器雷达图',
-      '专属成长建议清单（可执行版）',
-      '高级海报模板 · 去水印'
-    ],
-    cta: '解锁深度报告',
-    highlight: false
-  },
-  {
-    id: 'duo',
-    name: '双人合盘',
-    price: '39.9',
-    unit: '元 / 对',
-    desc: '最值得买的一个',
-    features: [
-      '你和 TA 各测一次',
-      '匹配度报告 · 互补点 / 冲突点',
-      '双方深度报告 + 雷达图',
-      '相处建议 & 高危时刻预警',
-      '高级海报模板 · 去水印'
-    ],
-    cta: '解锁双人合盘',
-    highlight: true,
-    badge: '最受欢迎'
-  }
-]
+// 单一付费通行证：¥0.99 解锁完整测试 + 保存结果
+export const PASS_PRICE = '0.99'
+
+export const PASS_PLAN = {
+  id: 'pass',
+  name: '完整测试通行证',
+  price: PASS_PRICE,
+  unit: '元 / 次',
+  desc: '一次付费，解锁完整测试与结果保存',
+  features: [
+    '19 道情境题（按性别 + 年龄段出题）',
+    '8 种触发器完整结果 + 心理学解释',
+    '防上头指南 & 适合 / 小心的人',
+    '保存高清结果长图到相册',
+    '生成专属分享海报'
+  ],
+  cta: `¥${PASS_PRICE} 解锁完整测试`
+}
+
+export const PLANS = [PASS_PLAN]
 
 export function getPlan(id) {
   return PLANS.find((plan) => plan.id === id) || null

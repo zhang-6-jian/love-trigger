@@ -61,7 +61,7 @@ function scrollTo(selector) {
       </a>
       <nav class="landing-nav">
         <button class="nav-link" @click="scrollTo('#types')">8 种类型</button>
-        <button class="nav-link" @click="scrollTo('#pricing')">付费套餐</button>
+        <button class="nav-link" @click="scrollTo('#pricing')">¥0.99 解锁</button>
         <button class="nav-link" @click="scrollTo('#reviews')">好评有底</button>
         <button class="btn btn--small btn--primary" @click="runPrimary">
           {{ allDone ? '看结果' : '开始测试' }}
@@ -97,7 +97,7 @@ function scrollTo(selector) {
             <template v-else>开始前先选性别和年龄段，题目会对应调整。</template>
           </div>
           <div class="hero__meta">
-            <span>8 种触发器</span><i></i><span>19 个真实瞬间</span><i></i><span>结果可存长图</span>
+            <span>8 种触发器</span><i></i><span>19 个真实瞬间</span><i></i><span>解锁后可存长图</span>
           </div>
         </div>
 
@@ -197,7 +197,7 @@ function scrollTo(selector) {
           </details>
           <details>
             <summary>结果能保存吗？</summary>
-            <p>可以生成一张完整长图，保存到手机相册；也支持复制结果文字和一键分享。</p>
+            <p>解锁后可以生成一张完整长图，保存到手机相册；也支持复制结果文字和一键分享。</p>
           </details>
           <details>
             <summary>会收集我的信息吗？</summary>

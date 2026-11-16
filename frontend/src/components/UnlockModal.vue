@@ -1,64 +1,57 @@
 <script setup>
-import { computed } from 'vue'
-import { closeModal, copyText, showToast, state } from '../lib/store'
+import { PASS_PLAN } from '../lib/plans'
+import { afterUnlock, closeModal, copyText, showToast } from '../lib/store'
 import ModalShell from './ModalShell.vue'
 import Icon from './Icon.vue'
 
 // 把这里换成你自己的微信号（或用 VITE_CONTACT_WECHAT 环境变量注入）
 const CONTACT_WECHAT = import.meta.env.VITE_CONTACT_WECHAT || 'love-trigger-lab'
 
-const plan = computed(() => state.unlockPlan || null)
-
 async function copyWechat() {
   const ok = await copyText(CONTACT_WECHAT)
-  showToast(ok ? '微信号已复制，去微信添加吧' : '复制失败，请手动记录微信号')
+  showToast(ok ? '微信号已复制，去微信付款吧' : '复制失败，请手动记录微信号')
 }
 </script>
 
 <template>
-  <ModalShell label="解锁套餐">
+  <ModalShell label="解锁完整测试">
     <div class="modal-head">
-      <span>解锁套餐</span>
+      <span>解锁完整测试</span>
       <button class="icon-btn" aria-label="关闭" @click="closeModal"><Icon name="close" /></button>
     </div>
 
-    <template v-if="plan">
-      <h2 class="modal-title">解锁「{{ plan.name }}」</h2>
-      <div class="unlock-price">
-        <span>¥</span><strong>{{ plan.price }}</strong><small>{{ plan.unit }}</small>
-      </div>
+    <h2 class="modal-title">¥{{ PASS_PLAN.price }}，解锁完整测试</h2>
+    <p class="modal-desc">{{ PASS_PLAN.desc }}。一次付费，不订阅、不自动续费。</p>
 
-      <ul class="unlock-list">
-        <li v-for="feature in plan.features" :key="feature">
-          <Icon name="check" /><span>{{ feature }}</span>
-        </li>
-      </ul>
+    <div class="unlock-price">
+      <span>¥</span><strong>{{ PASS_PLAN.price }}</strong><small>{{ PASS_PLAN.unit }}</small>
+      <s class="unlock-was">¥9.9</s>
+    </div>
 
-      <div class="unlock-box">
-        <p class="unlock-box__title">内测阶段 · 人工开通</p>
-        <p class="unlock-box__text">
-          暂不支持在线支付。添加管理员微信，备注你要的套餐，付款后 24 小时内把完整报告发给你。
-        </p>
-        <div class="unlock-wechat">
-          <span class="unlock-wechat__label">微信号</span>
-          <code>{{ CONTACT_WECHAT }}</code>
-          <button type="button" class="btn btn--small btn--ghost" @click="copyWechat">复制</button>
-        </div>
-      </div>
+    <ul class="unlock-list">
+      <li v-for="feature in PASS_PLAN.features" :key="feature">
+        <Icon name="check" /><span>{{ feature }}</span>
+      </li>
+    </ul>
 
-      <div class="modal-actions">
-        <button type="button" class="btn btn--ghost" @click="closeModal">先看看免费版</button>
-        <button type="button" class="btn btn--primary" @click="copyWechat">复制微信号去添加</button>
+    <div class="unlock-box">
+      <p class="unlock-box__title">第 1 步 · 付款</p>
+      <p class="unlock-box__text">
+        内测阶段暂不支持在线支付。添加管理员微信，转账 {{ PASS_PLAN.price }} 元并备注「测试」，对方会立刻帮你开通。
+      </p>
+      <div class="unlock-wechat">
+        <span class="unlock-wechat__label">微信号</span>
+        <code>{{ CONTACT_WECHAT }}</code>
+        <button type="button" class="btn btn--small btn--ghost" @click="copyWechat">复制</button>
       </div>
-    </template>
+      <p class="unlock-box__title unlock-box__title--step">第 2 步 · 解锁</p>
+      <p class="unlock-box__text">付款完成后点下面的按钮，即可开始答题。</p>
+    </div>
 
-    <template v-else>
-      <h2 class="modal-title">套餐信息已失效</h2>
-      <p class="modal-desc">请关闭后重新选择套餐。</p>
-      <div class="modal-actions">
-        <button type="button" class="btn btn--primary" @click="closeModal">知道了</button>
-      </div>
-    </template>
+    <div class="modal-actions">
+      <button type="button" class="btn btn--ghost" @click="closeModal">稍后再说</button>
+      <button type="button" class="btn btn--primary" @click="afterUnlock">我已付款，立即解锁</button>
+    </div>
   </ModalShell>
 </template>
 
@@ -78,7 +71,7 @@ async function copyWechat() {
 
 .unlock-price strong {
   font-family: var(--serif);
-  font-size: 40px;
+  font-size: 42px;
   line-height: 1;
 }
 
@@ -86,6 +79,12 @@ async function copyWechat() {
   margin-left: 5px;
   color: var(--muted);
   font-size: 12px;
+}
+
+.unlock-was {
+  margin-left: 10px;
+  color: #b8a89f;
+  font-size: 13px;
 }
 
 .unlock-list {
@@ -125,6 +124,10 @@ async function copyWechat() {
   font-weight: 600;
 }
 
+.unlock-box__title--step {
+  margin-top: 14px;
+}
+
 .unlock-box__text {
   margin: 0 0 12px;
   color: var(--muted);
@@ -137,9 +140,9 @@ async function copyWechat() {
   align-items: center;
   gap: 10px;
   padding: 10px 12px;
+  border: 1px solid var(--line);
   border-radius: 10px;
   background: var(--paper);
-  border: 1px solid var(--line);
 }
 
 .unlock-wechat__label {

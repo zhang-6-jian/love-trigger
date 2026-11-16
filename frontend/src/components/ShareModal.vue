@@ -1,7 +1,7 @@
 <script setup>
 import { computed } from 'vue'
 import { resultMeta } from '../data'
-import { closeModal, copyText, openModal, shareUrl, showToast, state } from '../lib/store'
+import { closeModal, copyText, openPoster, shareUrl, showToast, state } from '../lib/store'
 import ModalShell from './ModalShell.vue'
 import Icon from './Icon.vue'
 
@@ -14,7 +14,7 @@ async function copyLink() {
 }
 
 function savePoster() {
-  openModal('poster')
+  openPoster()
 }
 </script>
 

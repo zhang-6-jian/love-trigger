@@ -8,6 +8,7 @@ export const AGE_OPTIONS = AGE_GROUPS
 export const GENDER_OPTIONS = GENDERS
 
 const PROGRESS_KEY = 'love-trigger-progress-v2'
+const PASS_KEY = 'love-trigger-pass-v1'
 const LIKES_KEY = 'love-trigger-likes-v2'
 const VISITOR_KEY = 'love-trigger-visitor-id'
 const SERIAL_KEY = 'love-trigger-serial-v1'
@@ -35,7 +36,9 @@ export const state = reactive({
   stats: { totalAssessments: 0, typeCounts: {}, totalReviews: 0, recent: [] },
   serial: '',
   savedResultId: null,
-  unlockPlan: null
+  unlockPlan: null,
+  unlockIntent: '',
+  unlocked: false
 })
 
 /* ------------------------------------------------------------------ */
@@ -194,6 +197,10 @@ export function serialNo() {
 /* ------------------------------------------------------------------ */
 
 export function startQuiz(fresh = false) {
+  if (!state.unlocked) {
+    openUnlock(null, 'start')
+    return
+  }
   if (!state.ageGroup || !state.gender || !state.questions.length) {
     state.modal = 'age'
     return
@@ -306,9 +313,62 @@ export function openModal(name) {
   document.body.classList.add('modal-open')
 }
 
-export function openUnlock(plan) {
-  state.unlockPlan = plan
+export function openUnlock(plan, intent = 'start') {
+  state.unlockPlan = plan || null
+  state.unlockIntent = intent
   openModal('unlock')
+}
+
+/* ------------------------------------------------------------------ */
+/*  付费通行证                                                          */
+/* ------------------------------------------------------------------ */
+
+export function isPassUnlocked() {
+  try {
+    return localStorage.getItem(PASS_KEY) === '1'
+  } catch {
+    return false
+  }
+}
+
+export function unlockPass() {
+  state.unlocked = true
+  try {
+    localStorage.setItem(PASS_KEY, '1')
+  } catch {
+    /* 隐私模式下仅当前会话有效 */
+  }
+  state.modal = ''
+  document.body.classList.remove('modal-open')
+  showToast('已解锁，开始答题吧')
+  vibrate(12)
+}
+
+export function openPoster() {
+  if (!state.unlocked) {
+    openUnlock(null, 'poster')
+    return
+  }
+  openModal('poster')
+}
+
+// 解锁成功后继续用户原本想做的事
+export function afterUnlock() {
+  const intent = state.unlockIntent
+  state.unlockIntent = ''
+  unlockPass()
+  if (intent === 'poster') {
+    openModal('poster')
+    return
+  }
+  if (!state.ageGroup || !state.gender || !state.questions.length) {
+    openModal('age')
+    return
+  }
+  state.screen = 'quiz'
+  state.index = firstUnanswered()
+  setHash('#quiz')
+  scrollToTop()
 }
 
 export function closeModal() {
@@ -517,6 +577,7 @@ export async function shareResult() {
 /* ------------------------------------------------------------------ */
 
 export function boot() {
+  state.unlocked = isPassUnlocked()
   loadProgress()
 
   if (location.hash === '#stats') {

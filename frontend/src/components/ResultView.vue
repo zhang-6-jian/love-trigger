@@ -7,12 +7,12 @@ import {
   genderLabel,
   goHome,
   openModal,
-  openUnlock,
+  openPoster,
   serialNo,
   shareResult,
   state
 } from '../lib/store'
-import { PLANS } from '../lib/plans'
+import { PASS_PLAN } from '../lib/plans'
 import Icon from './Icon.vue'
 import ReviewList from './ReviewList.vue'
 
@@ -20,7 +20,6 @@ const result = computed(() => resultMeta(state.result.primary, state.gender))
 const secondary = computed(() => RESULTS[state.result.secondary])
 const dual = computed(() => state.result.dual)
 const stickyVisible = ref(false)
-const upsellPlans = PLANS.filter((plan) => plan.id !== 'free')
 
 function onScroll() {
   stickyVisible.value = window.scrollY > 360
@@ -75,7 +74,7 @@ onBeforeUnmount(() => window.removeEventListener('scroll', onScroll))
     </section>
 
     <section class="result-actions" aria-label="结果操作">
-      <button class="action-btn action-btn--primary" @click="openModal('poster')">
+      <button class="action-btn action-btn--primary" @click="openPoster">
         <Icon name="image" />
         <span><b>保存长图</b><small>存进手机相册</small></span>
       </button>
@@ -165,37 +164,21 @@ onBeforeUnmount(() => window.removeEventListener('scroll', onScroll))
     <section class="result-section upsell">
       <div class="section-head">
         <span class="section-no">04</span>
-        <div><p class="eyebrow">UNLOCK MORE</p><h2>想更懂自己？</h2></div>
+        <div><p class="eyebrow">UNLOCK</p><h2>保存这份结果</h2></div>
       </div>
-      <p class="upsell-lead">基础结果免费。下面这些是更深入的一层，看你要不要。</p>
-      <div class="upsell-grid">
-        <article
-          v-for="plan in upsellPlans"
-          :key="plan.id"
-          class="upsell-card"
-          :class="{ 'is-hot': plan.highlight }"
-        >
-          <div class="upsell-card__top">
-            <h3>{{ plan.name }}</h3>
-            <span v-if="plan.badge" class="upsell-card__badge">{{ plan.badge }}</span>
-          </div>
-          <p class="upsell-card__desc">{{ plan.desc }}</p>
-          <p class="upsell-card__price">
-            <span>¥</span>{{ plan.price }}<small>{{ plan.unit }}</small>
-          </p>
-          <ul class="upsell-card__list">
-            <li v-for="feature in plan.features" :key="feature">{{ feature }}</li>
-          </ul>
-          <button
-            type="button"
-            class="btn"
-            :class="plan.highlight ? 'btn--primary' : 'btn--ghost'"
-            @click="openUnlock(plan)"
-          >
-            {{ plan.cta }}
-          </button>
-        </article>
-      </div>
+      <article class="upsell-card">
+        <div class="upsell-card__top">
+          <h3>{{ PASS_PLAN.name }}</h3>
+          <span class="upsell-card__badge">¥{{ PASS_PLAN.price }}</span>
+        </div>
+        <p class="upsell-card__desc">{{ PASS_PLAN.desc }}</p>
+        <ul class="upsell-card__list">
+          <li v-for="feature in PASS_PLAN.features" :key="feature">{{ feature }}</li>
+        </ul>
+        <button type="button" class="btn btn--primary" @click="openPoster">
+          {{ state.unlocked ? '保存结果长图' : `¥${PASS_PLAN.price} 解锁并保存长图` }}
+        </button>
+      </article>
     </section>
 
     <section class="result-footer-cta">
@@ -203,7 +186,7 @@ onBeforeUnmount(() => window.removeEventListener('scroll', onScroll))
       <h2>把这个测试，发给那个总让你上头的人。</h2>
       <div>
         <button class="btn btn--primary" @click="shareResult">分享给对方</button>
-        <button class="btn btn--ghost" @click="openModal('poster')">保存长图</button>
+        <button class="btn btn--ghost" @click="openPoster">保存长图</button>
       </div>
     </section>
 
@@ -214,7 +197,7 @@ onBeforeUnmount(() => window.removeEventListener('scroll', onScroll))
     </footer>
 
     <div class="sticky-actions" :class="{ 'is-visible': stickyVisible }" aria-label="快捷操作">
-      <button @click="openModal('poster')"><Icon name="image" />保存长图</button>
+      <button @click="openPoster"><Icon name="image" />保存长图</button>
       <button @click="shareResult"><Icon name="share" />分享</button>
     </div>
   </main>
@@ -237,10 +220,12 @@ onBeforeUnmount(() => window.removeEventListener('scroll', onScroll))
 .upsell-card {
   display: flex;
   flex-direction: column;
+  max-width: 520px;
+  margin: 0 auto;
   padding: 20px 18px;
-  border: 1px solid var(--line);
+  border: 1px solid var(--accent);
   border-radius: 16px;
-  background: var(--paper);
+  background: linear-gradient(180deg, #fff6f3 0%, var(--paper) 40%);
 }
 
 .upsell-card.is-hot {
