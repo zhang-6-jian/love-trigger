@@ -17,7 +17,9 @@ const paths = {
   heart:
     '<path d="M20.8 5.6a5.5 5.5 0 0 0-7.8 0L12 6.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 22l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8Z"/>',
   close:
-    '<path d="m6 6 12 12M18 6 6 18"/>'
+    '<path d="m6 6 12 12M18 6 6 18"/>',
+  check:
+    '<path d="m5 12.5 4.5 4.5L19 7"/>'
 }
 
 const inner = paths[props.name] || ''

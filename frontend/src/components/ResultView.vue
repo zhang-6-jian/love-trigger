@@ -7,10 +7,12 @@ import {
   genderLabel,
   goHome,
   openModal,
+  openUnlock,
   serialNo,
   shareResult,
   state
 } from '../lib/store'
+import { PLANS } from '../lib/plans'
 import Icon from './Icon.vue'
 import ReviewList from './ReviewList.vue'
 
@@ -18,6 +20,7 @@ const result = computed(() => resultMeta(state.result.primary, state.gender))
 const secondary = computed(() => RESULTS[state.result.secondary])
 const dual = computed(() => state.result.dual)
 const stickyVisible = ref(false)
+const upsellPlans = PLANS.filter((plan) => plan.id !== 'free')
 
 function onScroll() {
   stickyVisible.value = window.scrollY > 360
@@ -159,6 +162,42 @@ onBeforeUnmount(() => window.removeEventListener('scroll', onScroll))
       <ReviewList :interactive="true" :show-write="true" @write="openModal('review')" />
     </section>
 
+    <section class="result-section upsell">
+      <div class="section-head">
+        <span class="section-no">04</span>
+        <div><p class="eyebrow">UNLOCK MORE</p><h2>想更懂自己？</h2></div>
+      </div>
+      <p class="upsell-lead">基础结果免费。下面这些是更深入的一层，看你要不要。</p>
+      <div class="upsell-grid">
+        <article
+          v-for="plan in upsellPlans"
+          :key="plan.id"
+          class="upsell-card"
+          :class="{ 'is-hot': plan.highlight }"
+        >
+          <div class="upsell-card__top">
+            <h3>{{ plan.name }}</h3>
+            <span v-if="plan.badge" class="upsell-card__badge">{{ plan.badge }}</span>
+          </div>
+          <p class="upsell-card__desc">{{ plan.desc }}</p>
+          <p class="upsell-card__price">
+            <span>¥</span>{{ plan.price }}<small>{{ plan.unit }}</small>
+          </p>
+          <ul class="upsell-card__list">
+            <li v-for="feature in plan.features" :key="feature">{{ feature }}</li>
+          </ul>
+          <button
+            type="button"
+            class="btn"
+            :class="plan.highlight ? 'btn--primary' : 'btn--ghost'"
+            @click="openUnlock(plan)"
+          >
+            {{ plan.cta }}
+          </button>
+        </article>
+      </div>
+    </section>
+
     <section class="result-footer-cta">
       <p class="eyebrow">SEND IT TO SOMEONE</p>
       <h2>把这个测试，发给那个总让你上头的人。</h2>
@@ -180,3 +219,116 @@ onBeforeUnmount(() => window.removeEventListener('scroll', onScroll))
     </div>
   </main>
 </template>
+
+<style scoped>
+.upsell-lead {
+  margin: -6px 0 18px;
+  color: var(--muted);
+  font-size: 13.5px;
+  line-height: 1.7;
+}
+
+.upsell-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.upsell-card {
+  display: flex;
+  flex-direction: column;
+  padding: 20px 18px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--paper);
+}
+
+.upsell-card.is-hot {
+  border-color: var(--accent);
+  background: linear-gradient(180deg, #fff6f3 0%, var(--paper) 40%);
+}
+
+.upsell-card__top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.upsell-card__top h3 {
+  margin: 0;
+  font-family: var(--serif);
+  font-size: 18px;
+}
+
+.upsell-card__badge {
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 10px;
+  white-space: nowrap;
+}
+
+.upsell-card__desc {
+  margin: 0 0 10px;
+  color: var(--muted);
+  font-size: 12.5px;
+}
+
+.upsell-card__price {
+  margin: 0 0 12px;
+  color: var(--accent);
+  font-family: var(--serif);
+  font-size: 26px;
+  line-height: 1;
+}
+
+.upsell-card__price span {
+  margin-right: 2px;
+  font-size: 14px;
+}
+
+.upsell-card__price small {
+  margin-left: 4px;
+  color: var(--muted);
+  font-family: var(--sans);
+  font-size: 11px;
+}
+
+.upsell-card__list {
+  display: grid;
+  flex: 1;
+  gap: 6px;
+  margin: 0 0 16px;
+  padding: 0;
+  list-style: none;
+}
+
+.upsell-card__list li {
+  position: relative;
+  padding-left: 13px;
+  color: var(--ink);
+  font-size: 12.5px;
+  line-height: 1.6;
+}
+
+.upsell-card__list li::before {
+  position: absolute;
+  left: 2px;
+  color: var(--accent);
+  font-weight: 700;
+  content: '·';
+}
+
+.upsell-card .btn {
+  width: 100%;
+  justify-content: center;
+}
+
+@media (max-width: 620px) {
+  .upsell-grid {
+    grid-template-columns: 1fr;
+  }
+}
+</style>

@@ -11,6 +11,7 @@ import PosterModal from './components/PosterModal.vue'
 import ReviewModal from './components/ReviewModal.vue'
 import AgeModal from './components/AgeModal.vue'
 import ConfirmModal from './components/ConfirmModal.vue'
+import UnlockModal from './components/UnlockModal.vue'
 
 function onKeydown(event) {
   if (event.key === 'Escape') {
@@ -44,6 +45,7 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKeydown))
   <PosterModal v-if="state.modal === 'poster'" />
   <ReviewModal v-if="state.modal === 'review'" />
   <AgeModal v-if="state.modal === 'age'" />
+  <UnlockModal v-if="state.modal === 'unlock'" />
   <ConfirmModal v-if="state.modal === 'restart' || state.modal === 'exit'" :kind="state.modal" />
 
   <div class="toast" :class="{ 'is-show': state.toastVisible }" role="status" aria-live="polite">

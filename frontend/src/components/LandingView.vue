@@ -15,6 +15,7 @@ import {
 } from '../lib/store'
 import Icon from './Icon.vue'
 import ReviewList from './ReviewList.vue'
+import PricingSection from './PricingSection.vue'
 
 const answered = computed(() => answeredCount())
 const allDone = computed(() => answered.value === TOTAL)
@@ -60,6 +61,7 @@ function scrollTo(selector) {
       </a>
       <nav class="landing-nav">
         <button class="nav-link" @click="scrollTo('#types')">8 种类型</button>
+        <button class="nav-link" @click="scrollTo('#pricing')">付费套餐</button>
         <button class="nav-link" @click="scrollTo('#reviews')">好评有底</button>
         <button class="btn btn--small btn--primary" @click="runPrimary">
           {{ allDone ? '看结果' : '开始测试' }}
@@ -176,6 +178,8 @@ function scrollTo(selector) {
           </button>
         </div>
       </section>
+
+      <PricingSection @start="runPrimary" />
 
       <section class="section faq">
         <div class="section-head">

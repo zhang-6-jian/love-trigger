@@ -34,7 +34,8 @@ export const state = reactive({
   toastVisible: false,
   stats: { totalAssessments: 0, typeCounts: {}, totalReviews: 0, recent: [] },
   serial: '',
-  savedResultId: null
+  savedResultId: null,
+  unlockPlan: null
 })
 
 /* ------------------------------------------------------------------ */
@@ -303,6 +304,11 @@ async function persistResult() {
 export function openModal(name) {
   state.modal = name
   document.body.classList.add('modal-open')
+}
+
+export function openUnlock(plan) {
+  state.unlockPlan = plan
+  openModal('unlock')
 }
 
 export function closeModal() {
