@@ -109,6 +109,14 @@ export const cloud = {
     return { ok: true }
   },
 
+  async redeemCode(code) {
+    const result = await request('rpc/redeem_code', {
+      method: 'POST',
+      body: JSON.stringify({ p_code: code })
+    })
+    return result === true
+  },
+
   async fetchStats() {
     const [overview, stats, recent] = await Promise.all([
       request('overview_stats?select=*'),

@@ -1,12 +1,12 @@
 <script setup>
 import { PASS_PLAN } from '../lib/plans'
-import { isPassUnlocked, openUnlock } from '../lib/store'
+import { openUnlock, state } from '../lib/store'
 import Icon from './Icon.vue'
 
 const emit = defineEmits(['start'])
 
 function choose() {
-  if (isPassUnlocked()) {
+  if (state.unlocked) {
     emit('start')
     return
   }
@@ -46,8 +46,8 @@ function choose() {
         {{ PASS_PLAN.cta }}
       </button>
       <p class="pass-card__hint">
-        <template v-if="isPassUnlocked()">你已解锁，可直接开始答题。</template>
-        <template v-else>内测阶段人工开通，付款后立即可用。</template>
+        <template v-if="state.unlocked">你已解锁，可直接开始答题。</template>
+        <template v-else>付款后联系管理员领取兑换码，填码即解锁。</template>
       </p>
     </article>
   </section>
