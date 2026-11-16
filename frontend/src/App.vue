@@ -1,5 +1,5 @@
 <script setup>
-import { onBeforeUnmount, onMounted, ref } from 'vue'
+import { onBeforeUnmount, onMounted } from 'vue'
 import { boot, chooseAnswer, closeModal, goBack, state } from './lib/store'
 import LandingView from './components/LandingView.vue'
 import QuizView from './components/QuizView.vue'
@@ -12,13 +12,6 @@ import ReviewModal from './components/ReviewModal.vue'
 import AgeModal from './components/AgeModal.vue'
 import ConfirmModal from './components/ConfirmModal.vue'
 import UnlockModal from './components/UnlockModal.vue'
-import AdminView from './components/AdminView.vue'
-
-const isAdmin = ref(false)
-
-function syncAdmin() {
-  isAdmin.value = location.hash.replace(/^#/, '').toLowerCase() === 'admin'
-}
 
 function onKeydown(event) {
   if (event.key === 'Escape') {
@@ -36,35 +29,26 @@ function onKeydown(event) {
 
 onMounted(() => {
   boot()
-  syncAdmin()
   window.addEventListener('keydown', onKeydown)
-  window.addEventListener('hashchange', syncAdmin)
 })
-onBeforeUnmount(() => {
-  window.removeEventListener('keydown', onKeydown)
-  window.removeEventListener('hashchange', syncAdmin)
-})
+onBeforeUnmount(() => window.removeEventListener('keydown', onKeydown))
 </script>
 
 <template>
-  <AdminView v-if="isAdmin" />
+  <LandingView v-if="state.screen === 'landing'" />
+  <QuizView v-else-if="state.screen === 'quiz'" />
+  <AnalyzingView v-else-if="state.screen === 'analyzing'" />
+  <ResultView v-else-if="state.screen === 'result'" />
+  <StatsView v-else-if="state.screen === 'stats'" />
 
-  <template v-else>
-    <LandingView v-if="state.screen === 'landing'" />
-    <QuizView v-else-if="state.screen === 'quiz'" />
-    <AnalyzingView v-else-if="state.screen === 'analyzing'" />
-    <ResultView v-else-if="state.screen === 'result'" />
-    <StatsView v-else-if="state.screen === 'stats'" />
+  <ShareModal v-if="state.modal === 'share'" />
+  <PosterModal v-if="state.modal === 'poster'" />
+  <ReviewModal v-if="state.modal === 'review'" />
+  <AgeModal v-if="state.modal === 'age'" />
+  <UnlockModal v-if="state.modal === 'unlock'" />
+  <ConfirmModal v-if="state.modal === 'restart' || state.modal === 'exit'" :kind="state.modal" />
 
-    <ShareModal v-if="state.modal === 'share'" />
-    <PosterModal v-if="state.modal === 'poster'" />
-    <ReviewModal v-if="state.modal === 'review'" />
-    <AgeModal v-if="state.modal === 'age'" />
-    <UnlockModal v-if="state.modal === 'unlock'" />
-    <ConfirmModal v-if="state.modal === 'restart' || state.modal === 'exit'" :kind="state.modal" />
-
-    <div class="toast" :class="{ 'is-show': state.toastVisible }" role="status" aria-live="polite">
-      {{ state.toast }}
-    </div>
-  </template>
+  <div class="toast" :class="{ 'is-show': state.toastVisible }" role="status" aria-live="polite">
+    {{ state.toast }}
+  </div>
 </template>
