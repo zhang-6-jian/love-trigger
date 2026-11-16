@@ -3,7 +3,8 @@ const props = defineProps({
   result: { type: Object, required: true },
   secondary: { type: Object, required: true },
   qr: { type: String, default: '' },
-  serial: { type: String, required: true }
+  serial: { type: String, required: true },
+  showQr: { type: Boolean, default: true }
 })
 
 const keywords = (props.result.keywords || []).slice(0, 3)
@@ -44,18 +45,18 @@ const scenes = (props.result.scenes || []).slice(0, 2)
       <strong>{{ secondary.name }}</strong>
     </div>
 
-    <footer class="card__foot">
-      <div class="card__qr">
+    <footer class="card__foot" :class="{ 'is-noqr': !showQr }">
+      <div v-if="showQr" class="card__qr">
         <img v-if="qr" :src="qr" alt="扫码测同款" />
       </div>
       <div class="card__cta">
         <strong>你是被哪个瞬间拿捏的？</strong>
         <p>19 道情境题 · 按性别+年龄段出题</p>
-        <p>扫码测你的上头触发器</p>
+        <p>{{ showQr ? '扫码测你的上头触发器' : '搜索「恋爱上头触发器」测同款' }}</p>
       </div>
     </footer>
 
-    <p class="card__note">仅供娱乐与自我观察，不构成心理诊断或医疗建议。</p>
+    <p class="card__note">仅供娱乐与自我了解参考，不构成心理诊断、医疗建议或心理治疗。</p>
   </div>
 </template>
 
@@ -231,6 +232,10 @@ const scenes = (props.result.scenes || []).slice(0, 2)
   margin-top: 16px;
   padding-top: 18px;
   border-top: 1px solid rgba(42, 33, 29, 0.12);
+}
+
+.card__foot.is-noqr {
+  justify-content: center;
 }
 
 .card__qr {

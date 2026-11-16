@@ -25,7 +25,9 @@ const secondary = computed(() => RESULTS[state.result.secondary])
 const serial = computed(() => serialNo())
 const filename = computed(() => {
   const base = posterFilename(result.value.name, serial.value)
-  return mode.value === 'square' ? base.replace(/\.png$/i, '-3x4.png') : base
+  if (mode.value === 'square') return base.replace(/\.png$/i, '-3x4.png')
+  if (mode.value === 'xhs') return base.replace(/\.png$/i, '-xhs.png')
+  return base
 })
 const hint = computed(() =>
   isIOS
@@ -125,13 +127,22 @@ onMounted(generate)
     </div>
     <h2 class="modal-title">你的心动诊断书</h2>
     <p class="modal-desc">
-      {{ mode === 'long' ? '长图按结果页内容生成，适合发朋友圈或聊天。' : '竖版 3:4 卡图，适合发小红书 / 朋友圈九宫格。' }}
+      {{
+        mode === 'long'
+          ? '长图按结果页内容生成，适合发朋友圈或聊天。'
+          : mode === 'square'
+            ? '竖版 3:4 卡图，适合发小红书 / 朋友圈九宫格。'
+            : '无二维码版，专为小红书笔记准备，避免被判站外导流。'
+      }}
     </p>
 
     <div class="poster-tabs">
       <button type="button" :class="{ 'is-on': mode === 'long' }" @click="mode = 'long'">长图</button>
       <button type="button" :class="{ 'is-on': mode === 'square' }" @click="mode = 'square'">
         小红书 3:4
+      </button>
+      <button type="button" :class="{ 'is-on': mode === 'xhs' }" @click="mode = 'xhs'">
+        小红书·无码
       </button>
     </div>
 
@@ -163,6 +174,7 @@ onMounted(generate)
         :secondary="secondary"
         :qr="qr"
         :serial="serial"
+        :show-qr="mode === 'square'"
       />
     </div>
   </ModalShell>
