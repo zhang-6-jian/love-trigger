@@ -47,7 +47,7 @@ function choose() {
       </button>
       <p class="pass-card__hint">
         <template v-if="state.unlocked">你已解锁，可直接开始答题。</template>
-        <template v-else>付款后联系管理员领取兑换码，填码即解锁。</template>
+        <template v-else>扫码付款后点「我已付款」即可解锁。</template>
       </p>
     </article>
   </section>

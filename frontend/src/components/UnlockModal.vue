@@ -1,8 +1,7 @@
 <script setup>
 import { computed, ref } from 'vue'
 import { PASS_PLAN } from '../lib/plans'
-import { afterUnlock, closeModal, copyText, getVisitorId, showToast } from '../lib/store'
-import { cloud, cloudEnabled } from '../lib/cloud'
+import { afterUnlock, closeModal, copyText, showToast } from '../lib/store'
 import ModalShell from './ModalShell.vue'
 import Icon from './Icon.vue'
 
@@ -32,37 +31,6 @@ const CONTACT_WECHAT = import.meta.env.VITE_CONTACT_WECHAT || 'love-trigger-lab'
 async function copyWechat() {
   const ok = await copyText(CONTACT_WECHAT)
   showToast(ok ? '微信号已复制，去微信付款吧' : '复制失败，请手动记录微信号')
-}
-
-/* 兑换码核销 */
-const code = ref('')
-const submitting = ref(false)
-const errorMsg = ref('')
-
-async function redeem() {
-  const value = code.value.trim().toUpperCase()
-  if (!value) {
-    errorMsg.value = '请输入兑换码'
-    return
-  }
-  if (!cloudEnabled) {
-    errorMsg.value = '云端暂不可用，请联系管理员'
-    return
-  }
-  submitting.value = true
-  errorMsg.value = ''
-  try {
-    const ok = await cloud.redeemCode(value, getVisitorId())
-    if (ok) {
-      afterUnlock()
-    } else {
-      errorMsg.value = '兑换码无效或已被使用'
-    }
-  } catch (error) {
-    errorMsg.value = error?.message || '核销失败，请检查网络后重试'
-  } finally {
-    submitting.value = false
-  }
 }
 </script>
 
@@ -113,30 +81,13 @@ async function redeem() {
         <button type="button" class="btn btn--small btn--ghost" @click="copyWechat">复制</button>
       </div>
 
-      <p class="unlock-box__title unlock-box__title--step">第 2 步 · 输入兑换码</p>
-      <p class="unlock-box__text">
-        付款后微信联系管理员，说明「恋爱上头触发器」，会收到一个一次性兑换码，填进来即可解锁。
-      </p>
-      <input
-        v-model="code"
-        class="code-input"
-        type="text"
-        inputmode="text"
-        autocapitalize="characters"
-        autocomplete="off"
-        spellcheck="false"
-        maxlength="10"
-        placeholder="LTXXXXXXXX"
-        @keyup.enter="redeem"
-      />
-      <p v-if="errorMsg" class="code-error">{{ errorMsg }}</p>
+      <p class="unlock-box__title unlock-box__title--step">第 2 步 · 解锁</p>
+      <p class="unlock-box__text">付款完成后点下面的按钮，即可开始答题。</p>
     </div>
 
     <div class="modal-actions">
       <button type="button" class="btn btn--ghost" @click="closeModal">稍后再说</button>
-      <button type="button" class="btn btn--primary" :disabled="submitting" @click="redeem">
-        {{ submitting ? '核销中…' : '核销并解锁' }}
-      </button>
+      <button type="button" class="btn btn--primary" @click="afterUnlock">我已付款，立即解锁</button>
     </div>
   </ModalShell>
 </template>
@@ -296,41 +247,5 @@ async function redeem() {
   font-weight: 600;
   letter-spacing: 0.02em;
   word-break: break-all;
-}
-
-.code-input {
-  width: 100%;
-  padding: 12px 14px;
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  background: var(--paper);
-  color: var(--ink);
-  font-family: var(--sans);
-  font-size: 16px;
-  font-weight: 600;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  outline: none;
-  transition:
-    border-color 0.2s ease,
-    box-shadow 0.2s ease;
-}
-
-.code-input::placeholder {
-  color: #c3b3aa;
-  font-weight: 400;
-  letter-spacing: 0.08em;
-}
-
-.code-input:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(214, 92, 72, 0.12);
-}
-
-.code-error {
-  margin: 8px 0 0;
-  color: #c0392b;
-  font-size: 12.5px;
-  line-height: 1.6;
 }
 </style>
