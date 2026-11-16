@@ -96,7 +96,11 @@ onMounted(async () => {
           <span class="recent-row__dot" :style="{ background: RESULTS[item.primary].color }"></span>
           <div class="recent-row__main">
             <strong>{{ RESULTS[item.primary].name }}</strong>
-            <small>副类型：{{ RESULTS[item.secondary].name }}<template v-if="item.ageGroup"> · {{ ageGroupLabel(item.ageGroup) }}</template></small>
+            <small>
+              副类型：{{ RESULTS[item.secondary].name }}
+              <template v-if="item.gender"> · {{ item.gender === 'female' ? '女' : '男' }}</template>
+              <template v-if="item.ageGroup"> · {{ ageGroupLabel(item.ageGroup) }}</template>
+            </small>
           </div>
           <span class="recent-row__time">{{ formatTime(item.createdAt) }}</span>
         </div>

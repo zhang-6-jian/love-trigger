@@ -1,11 +1,11 @@
 <script setup>
 import { computed } from 'vue'
-import { RESULTS } from '../data'
+import { resultMeta } from '../data'
 import { closeModal, copyText, openModal, shareUrl, showToast, state } from '../lib/store'
 import ModalShell from './ModalShell.vue'
 import Icon from './Icon.vue'
 
-const result = computed(() => RESULTS[state.result.primary])
+const result = computed(() => resultMeta(state.result.primary, state.gender))
 
 async function copyLink() {
   const ok = await copyText(shareUrl())

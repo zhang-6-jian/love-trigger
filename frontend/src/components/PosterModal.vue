@@ -2,7 +2,7 @@
 import { computed, nextTick, onMounted, ref } from 'vue'
 import html2canvas from 'html2canvas'
 import QRCode from 'qrcode'
-import { RESULTS } from '../data'
+import { RESULTS, resultMeta } from '../data'
 import { closeModal, serialNo, shareUrl, showToast, state } from '../lib/store'
 import { downloadBlob, posterFilename, shareBlobFile } from '../lib/poster'
 import ModalShell from './ModalShell.vue'
@@ -17,7 +17,7 @@ const blob = ref(null)
 const failed = ref(false)
 const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent)
 
-const result = computed(() => RESULTS[state.result.primary])
+const result = computed(() => resultMeta(state.result.primary, state.gender))
 const secondary = computed(() => RESULTS[state.result.secondary])
 const serial = computed(() => serialNo())
 const filename = computed(() => posterFilename(result.value.name, serial.value))

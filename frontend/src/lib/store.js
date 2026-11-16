@@ -1,10 +1,11 @@
 import { reactive } from 'vue'
-import { RESULTS, TYPE_ORDER, SEED_REVIEWS } from '../data'
-import { AGE_GROUPS, QUESTION_SETS } from '../questions'
+import { RESULTS, TYPE_ORDER, SEED_REVIEWS, resultMeta } from '../data'
+import { AGE_GROUPS, GENDERS, QUESTION_SETS } from '../questions'
 import { cloud, cloudEnabled } from './cloud'
 
-export const TOTAL = 18
+export const TOTAL = 19
 export const AGE_OPTIONS = AGE_GROUPS
+export const GENDER_OPTIONS = GENDERS
 
 const PROGRESS_KEY = 'love-trigger-progress-v2'
 const LIKES_KEY = 'love-trigger-likes-v2'
@@ -20,6 +21,7 @@ export const state = reactive({
   index: 0,
   answers: Array(TOTAL).fill(null),
   ageGroup: '',
+  gender: '',
   questions: [],
   result: null,
   animating: false,
@@ -89,6 +91,14 @@ export function ageGroupLabel(id = state.ageGroup) {
   return AGE_GROUPS.find((group) => group.id === id)?.label || ''
 }
 
+export function genderLabel(id = state.gender) {
+  return GENDERS.find((g) => g.id === id)?.label || ''
+}
+
+function questionKey(ageId, genderId) {
+  return `${ageId}-${genderId}`
+}
+
 /* ------------------------------------------------------------------ */
 /*  答题进度                                                            */
 /* ------------------------------------------------------------------ */
@@ -108,6 +118,7 @@ function saveProgress() {
       PROGRESS_KEY,
       JSON.stringify({
         ageGroup: state.ageGroup,
+        gender: state.gender,
         answers: state.answers,
         index: state.index,
         updatedAt: Date.now()
@@ -123,9 +134,11 @@ function loadProgress() {
     const raw = localStorage.getItem(PROGRESS_KEY)
     if (!raw) return
     const saved = JSON.parse(raw)
-    if (!QUESTION_SETS[saved.ageGroup]) return
+    const key = questionKey(saved.ageGroup, saved.gender)
+    if (!QUESTION_SETS[key]) return
     state.ageGroup = saved.ageGroup
-    state.questions = QUESTION_SETS[saved.ageGroup]
+    state.gender = saved.gender
+    state.questions = QUESTION_SETS[key]
     if (Array.isArray(saved.answers) && saved.answers.length === TOTAL) {
       state.answers = saved.answers.map((answer) => (TYPE_ORDER.includes(answer) ? answer : null))
       state.index = Math.min(Math.max(Number(saved.index) || 0, 0), TOTAL - 1)
@@ -180,7 +193,7 @@ export function serialNo() {
 /* ------------------------------------------------------------------ */
 
 export function startQuiz(fresh = false) {
-  if (!state.ageGroup || !state.questions.length) {
+  if (!state.ageGroup || !state.gender || !state.questions.length) {
     state.modal = 'age'
     return
   }
@@ -191,10 +204,12 @@ export function startQuiz(fresh = false) {
   scrollToTop()
 }
 
-export function startWithAge(ageId) {
-  if (!QUESTION_SETS[ageId]) return
+export function startWithChoices(ageId, genderId) {
+  const key = questionKey(ageId, genderId)
+  if (!QUESTION_SETS[key]) return
   state.ageGroup = ageId
-  state.questions = QUESTION_SETS[ageId]
+  state.gender = genderId
+  state.questions = QUESTION_SETS[key]
   resetProgress()
   state.modal = ''
   state.screen = 'quiz'
@@ -203,6 +218,9 @@ export function startWithAge(ageId) {
   scrollToTop()
   saveProgress()
 }
+
+// 兼容旧名
+export const startWithAge = startWithChoices
 
 export function openAgeModal() {
   state.modal = 'age'
@@ -270,6 +288,7 @@ async function persistResult() {
       secondary: state.result.secondary,
       dual: state.result.dual,
       ageGroup: state.ageGroup,
+      gender: state.gender,
       visitorId: getVisitorId()
     })
   } catch (error) {
@@ -452,7 +471,7 @@ export async function copyText(text) {
 }
 
 export function resultShareText() {
-  const result = RESULTS[state.result.primary]
+  const result = resultMeta(state.result.primary, state.gender)
   const secondary = RESULTS[state.result.secondary]
   return [
     `我的恋爱上头触发器是「${result.name}」`,
@@ -470,7 +489,7 @@ export async function copyResult() {
 }
 
 export async function shareResult() {
-  const result = RESULTS[state.result.primary]
+  const result = resultMeta(state.result.primary, state.gender)
   const data = {
     title: '恋爱上头触发器',
     text: `我是「${result.name}」：${result.tagline}`,

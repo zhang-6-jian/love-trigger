@@ -1,9 +1,10 @@
 <script setup>
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
-import { RESULTS } from '../data'
+import { RESULTS, resultMeta } from '../data'
 import {
   ageGroupLabel,
   copyResult,
+  genderLabel,
   goHome,
   openModal,
   serialNo,
@@ -13,7 +14,7 @@ import {
 import Icon from './Icon.vue'
 import ReviewList from './ReviewList.vue'
 
-const result = computed(() => RESULTS[state.result.primary])
+const result = computed(() => resultMeta(state.result.primary, state.gender))
 const secondary = computed(() => RESULTS[state.result.secondary])
 const dual = computed(() => state.result.dual)
 const stickyVisible = ref(false)
@@ -33,7 +34,9 @@ onBeforeUnmount(() => window.removeEventListener('scroll', onScroll))
   <main class="result-shell">
     <header class="result-nav">
       <button class="brand-mini" @click="goHome">← 首页</button>
-      <span class="result-nav__tag">{{ ageGroupLabel() }} · 结果报告</span>
+      <span class="result-nav__tag">
+        <template v-if="state.gender">{{ genderLabel() }} · </template>{{ ageGroupLabel() }} · 结果报告
+      </span>
       <button class="icon-btn" aria-label="重新测试" @click="openModal('restart')"><Icon name="refresh" /></button>
     </header>
 
@@ -48,7 +51,9 @@ onBeforeUnmount(() => window.removeEventListener('scroll', onScroll))
           <small>{{ result.english }}</small>
         </div>
         <div class="result-title-wrap">
-          <p class="result-ratio">{{ ageGroupLabel() }} · 18 题结果</p>
+          <p class="result-ratio">
+            <template v-if="state.gender">{{ genderLabel() }} · </template>{{ ageGroupLabel() }} · 19 题结果
+          </p>
           <h1>{{ result.name }}</h1>
           <p class="result-tagline">{{ result.tagline }}</p>
           <div class="keyword-row">

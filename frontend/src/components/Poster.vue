@@ -87,7 +87,7 @@ const date = computed(() =>
       </div>
       <div>
         <strong>你是被哪个瞬间拿捏的？</strong>
-        <p>18 道情境题 · 按年龄段出题<br />扫码或搜索「恋爱上头触发器」</p>
+        <p>19 道情境题 · 按性别+年龄段出题<br />扫码或搜索「恋爱上头触发器」</p>
       </div>
     </footer>
     <p class="poster__disclaimer">本测试仅供娱乐与自我观察，不构成心理诊断或恋爱建议。</p>

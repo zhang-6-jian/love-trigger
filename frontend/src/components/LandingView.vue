@@ -5,6 +5,7 @@ import {
   TOTAL,
   ageGroupLabel,
   answeredCount,
+  genderLabel,
   goHome,
   openAgeModal,
   openModal,
@@ -58,7 +59,7 @@ function scrollTo(selector) {
         <span class="brand__text"><b>上头研究所</b><small>LOVE TRIGGER LAB</small></span>
       </a>
       <nav class="landing-nav">
-        <button class="nav-link" @click="scrollTo('#types')">6 种类型</button>
+        <button class="nav-link" @click="scrollTo('#types')">8 种类型</button>
         <button class="nav-link" @click="scrollTo('#reviews')">好评有底</button>
         <button class="btn btn--small btn--primary" @click="runPrimary">
           {{ allDone ? '看结果' : '开始测试' }}
@@ -69,10 +70,10 @@ function scrollTo(selector) {
     <main>
       <section class="hero">
         <div class="hero__copy">
-          <p class="eyebrow"><span class="eyebrow__dot"></span>恋爱人格 · 按年龄段出题 · 约 4 分钟</p>
+          <p class="eyebrow"><span class="eyebrow__dot"></span>恋爱人格 · 按性别+年龄段出题 · 约 4 分钟</p>
           <h1>你不是恋爱脑，<br /><em>你只是被某个瞬间</em><br />拿捏了。</h1>
           <p class="hero__lead">
-            18 道贴近你所在年龄段的情境题，拆出你在恋爱里最容易上头的那个瞬间。不是给你贴标签，是让你看清自己的“心动开关”。
+            19 道贴近你所在年龄段和性别的情境题，拆出你在恋爱里最容易上头的那个瞬间。不是给你贴标签，是让你看清自己的“心动开关”。
           </p>
           <div class="hero__actions">
             <button class="btn btn--primary btn--large" @click="runPrimary">
@@ -87,14 +88,14 @@ function scrollTo(selector) {
             </button>
           </div>
           <div class="hero__age">
-            <template v-if="state.ageGroup">
-              当前年龄段：<b>{{ ageGroupLabel() }}</b>
+            <template v-if="state.ageGroup && state.gender">
+              当前：<b>{{ genderLabel() }} · {{ ageGroupLabel() }}</b>
               <button type="button" @click="openAgeModal">更换</button>
             </template>
-            <template v-else>开始前先选年龄段，题目会按阶段变化。</template>
+            <template v-else>开始前先选性别和年龄段，题目会对应调整。</template>
           </div>
           <div class="hero__meta">
-            <span>6 种触发器</span><i></i><span>18 个真实瞬间</span><i></i><span>结果可存长图</span>
+            <span>8 种触发器</span><i></i><span>19 个真实瞬间</span><i></i><span>结果可存长图</span>
           </div>
         </div>
 
@@ -103,7 +104,7 @@ function scrollTo(selector) {
           <div class="hero-card hero-card--mid"></div>
           <article class="hero-card hero-card--main">
             <div class="hero-card__top"><span>恋爱上头触发器</span><span>内测版</span></div>
-            <div class="hero-card__seal">6<small>种触发器</small></div>
+            <div class="hero-card__seal">8<small>种触发器</small></div>
             <p class="hero-card__kicker">YOUR TRIGGER</p>
             <h2>你会被<br />哪个瞬间<br /><em>击中？</em></h2>
             <div class="hero-card__list">
@@ -111,7 +112,7 @@ function scrollTo(selector) {
                 <span :style="{ '--dot': RESULTS[type].color }"></span>{{ RESULTS[type].short }}<b>0{{ index + 1 }}</b>
               </div>
             </div>
-            <div class="hero-card__foot">18 QUESTIONS · 4 MIN</div>
+            <div class="hero-card__foot">19 QUESTIONS · 4 MIN</div>
           </article>
           <div class="float-chip float-chip--a">心动不是玄学<br /><b>是有开关的</b></div>
           <div class="float-chip float-chip--b">已生成 {{ totalText }} 份<br /><b>心动诊断书</b></div>
@@ -120,7 +121,7 @@ function scrollTo(selector) {
 
       <section id="types" class="section">
         <div class="section-head section-head--center">
-          <p class="eyebrow">THE 6 TRIGGERS</p>
+          <p class="eyebrow">THE 8 TRIGGERS</p>
           <h2>你会被哪种瞬间击中？</h2>
           <p class="section-sub">没有好坏，只有你更容易在哪一类瞬间里沦陷。</p>
         </div>
@@ -152,12 +153,12 @@ function scrollTo(selector) {
           <article class="step-card">
             <span class="step-card__no">01</span>
             <h3>凭第一反应选</h3>
-            <p>18 道贴近你年龄段的情境题，没有标准答案，也别想太久。</p>
+            <p>19 道贴近你年龄段和性别的情境题，没有标准答案，也别想太久。</p>
           </article>
           <article class="step-card">
             <span class="step-card__no">02</span>
             <h3>拆出你的触发器</h3>
-            <p>6 种类型，主类型 + 副类型，看清你最容易在哪类瞬间里沦陷。</p>
+            <p>8 种类型，主类型 + 副类型，看清你最容易在哪类瞬间里沦陷。</p>
           </article>
           <article class="step-card">
             <span class="step-card__no">03</span>
@@ -184,11 +185,11 @@ function scrollTo(selector) {
         <div class="faq-list">
           <details>
             <summary>这个测试准吗？</summary>
-            <p>它不负责诊断你，只负责把你熟悉的瞬间说清楚。结果基于 6 种常见的心动触发器，适合自我观察和聊天，不构成心理诊断。</p>
+            <p>它不负责诊断你，只负责把你熟悉的瞬间说清楚。结果基于 8 种常见的心动触发器，适合自我观察和聊天，不构成心理诊断。</p>
           </details>
           <details>
             <summary>要答多久？</summary>
-            <p>18 题，大约 4 分钟。开始前先选年龄段，题目会对应你的阶段；选择后自动进入下一题，也可以随时返回修改。</p>
+            <p>19 题，大约 4 分钟。开始前先选性别和年龄段，题目会对应你的阶段和性别；选择后自动进入下一题，也可以随时返回修改。</p>
           </details>
           <details>
             <summary>结果能保存吗？</summary>

@@ -102,6 +102,7 @@ export const cloud = {
         secondary_type: payload.secondary,
         dual: payload.dual,
         age_group: payload.ageGroup,
+        gender: payload.gender || null,
         visitor_id: payload.visitorId
       })
     })
@@ -126,6 +127,7 @@ export const cloud = {
         secondary: row.secondary_type,
         dual: Boolean(row.dual),
         ageGroup: row.age_group || '',
+        gender: row.gender || '',
         createdAt: row.created_at
       }))
     }
