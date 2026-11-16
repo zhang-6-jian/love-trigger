@@ -1,10 +1,26 @@
 <script setup>
+import { computed, ref } from 'vue'
 import { PASS_PLAN } from '../lib/plans'
 import { afterUnlock, closeModal, copyText, showToast } from '../lib/store'
 import ModalShell from './ModalShell.vue'
 import Icon from './Icon.vue'
 
-// 把这里换成你自己的微信号（或用 VITE_CONTACT_WECHAT 环境变量注入）
+const base = import.meta.env.BASE_URL
+const PAY_QR = {
+  wechat: { label: '微信支付', src: `${base}pay-wechat.jpg` },
+  alipay: { label: '支付宝', src: `${base}pay-alipay.jpg` }
+}
+
+const payChannel = ref('wechat')
+const qrFailed = ref(false)
+const currentQr = computed(() => PAY_QR[payChannel.value])
+
+function switchChannel(channel) {
+  payChannel.value = channel
+  qrFailed.value = false
+}
+
+// 收款码加载失败时的兜底：微信号（可用 VITE_CONTACT_WECHAT 覆盖）
 const CONTACT_WECHAT = import.meta.env.VITE_CONTACT_WECHAT || 'love-trigger-lab'
 
 async function copyWechat() {
@@ -35,15 +51,31 @@ async function copyWechat() {
     </ul>
 
     <div class="unlock-box">
-      <p class="unlock-box__title">第 1 步 · 付款</p>
-      <p class="unlock-box__text">
-        内测阶段暂不支持在线支付。添加管理员微信，转账 {{ PASS_PLAN.price }} 元并备注「测试」，对方会立刻帮你开通。
-      </p>
-      <div class="unlock-wechat">
+      <p class="unlock-box__title">第 1 步 · 扫码付款 ¥{{ PASS_PLAN.price }}</p>
+
+      <div v-if="!qrFailed" class="pay-qr">
+        <div class="pay-tabs">
+          <button
+            v-for="(item, key) in PAY_QR"
+            :key="key"
+            type="button"
+            class="pay-tab"
+            :class="{ 'is-on': payChannel === key }"
+            @click="switchChannel(key)"
+          >
+            {{ item.label }}
+          </button>
+        </div>
+        <img :src="currentQr.src" :alt="`${currentQr.label}收款码`" @error="qrFailed = true" />
+        <p class="pay-qr__hint">长按二维码识别 · 付款金额 ¥{{ PASS_PLAN.price }}</p>
+      </div>
+
+      <div v-else class="unlock-wechat">
         <span class="unlock-wechat__label">微信号</span>
         <code>{{ CONTACT_WECHAT }}</code>
         <button type="button" class="btn btn--small btn--ghost" @click="copyWechat">复制</button>
       </div>
+
       <p class="unlock-box__title unlock-box__title--step">第 2 步 · 解锁</p>
       <p class="unlock-box__text">付款完成后点下面的按钮，即可开始答题。</p>
     </div>
@@ -133,6 +165,58 @@ async function copyWechat() {
   color: var(--muted);
   font-size: 12.5px;
   line-height: 1.7;
+}
+
+.pay-qr {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+
+.pay-tabs {
+  display: inline-flex;
+  gap: 4px;
+  padding: 3px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.pay-tab {
+  padding: 5px 14px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 12.5px;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
+}
+
+.pay-tab.is-on {
+  background: var(--paper);
+  color: var(--ink);
+  font-weight: 600;
+  box-shadow: 0 1px 4px rgba(64, 40, 28, 0.12);
+}
+
+.pay-qr img {
+  width: 100%;
+  max-width: 240px;
+  height: auto;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #fff;
+}
+
+.pay-qr__hint {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.6;
+  text-align: center;
 }
 
 .unlock-wechat {
